@@ -1,0 +1,1797 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Veri İletişimi — Sunum Şablonu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── RESET & BASE ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy-950: #020817;
+      --navy-900: #0a1628;
+      --navy-800: #0f2040;
+      --navy-700: #142952;
+      --navy-600: #1a3366;
+      --navy-500: #1e3d7a;
+      --accent-cyan:  #00d4ff;
+      --accent-blue:  #4f9eff;
+      --accent-teal:  #00ffcc;
+      --accent-purple:#a855f7;
+      --text-primary: #e8f0fe;
+      --text-secondary: #8bafd4;
+      --text-muted:   #4a6fa5;
+      --slide-w: 1280px;
+      --slide-h: 720px;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: #010c1a;
+      font-family: 'Inter', sans-serif;
+      color: var(--text-primary);
+      overflow: hidden;
+    }
+
+    /* ─── PRESENTATION WRAPPER ─────────────────────────────────── */
+    #presentation {
+      width: var(--slide-w);
+      height: var(--slide-h);
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(var(--scale, 1));
+      transform-origin: center center;
+    }
+
+    /* ─── SLIDE BASE ───────────────────────────────────────────── */
+    .slide {
+      width: var(--slide-w);
+      height: var(--slide-h);
+      position: absolute;
+      top: 0; left: 0;
+      background: var(--navy-900);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s cubic-bezier(0.4,0,0.2,1),
+                  transform 0.6s cubic-bezier(0.4,0,0.2,1);
+      transform: translateX(60px);
+    }
+    .slide.active {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(0);
+    }
+    .slide.exit {
+      opacity: 0;
+      transform: translateX(-60px);
+    }
+
+    /* ─── CANVAS BACKGROUND ────────────────────────────────────── */
+    .bg-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    /* ─── GRADIENT OVERLAY ─────────────────────────────────────── */
+    .slide::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* ─── SLIDE CONTENT LAYER ──────────────────────────────────── */
+    .slide-content {
+      position: relative;
+      z-index: 10;
+      width: 100%; height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── TOP BAR ──────────────────────────────────────────────── */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 48px 0;
+      flex-shrink: 0;
+    }
+    .top-bar .logo-mark {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--accent-cyan);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+    .logo-mark .dot-grid {
+      display: grid;
+      grid-template-columns: repeat(3,6px);
+      gap: 3px;
+    }
+    .logo-mark .dot-grid span {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      opacity: 0.6;
+      animation: dotPulse 2.4s ease-in-out infinite;
+    }
+    .logo-mark .dot-grid span:nth-child(2) { animation-delay: 0.2s; }
+    .logo-mark .dot-grid span:nth-child(3) { animation-delay: 0.4s; }
+    .logo-mark .dot-grid span:nth-child(4) { animation-delay: 0.6s; }
+    .logo-mark .dot-grid span:nth-child(5) { animation-delay: 0.8s; }
+    .logo-mark .dot-grid span:nth-child(6) { animation-delay: 1.0s; }
+    .logo-mark .dot-grid span:nth-child(7) { animation-delay: 1.2s; }
+    .logo-mark .dot-grid span:nth-child(8) { animation-delay: 1.4s; }
+    .logo-mark .dot-grid span:nth-child(9) { animation-delay: 1.6s; }
+    @keyframes dotPulse {
+      0%,100% { opacity: 0.25; transform: scale(0.8); }
+      50%      { opacity: 1;    transform: scale(1.1); }
+    }
+
+    .top-bar .slide-counter {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+    }
+    .top-bar .slide-counter span { color: var(--accent-cyan); }
+
+    /* ─── PROGRESS LINE ────────────────────────────────────────── */
+    .progress-line {
+      height: 2px;
+      background: rgba(255,255,255,0.06);
+      margin: 14px 48px 0;
+      border-radius: 2px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
+      border-radius: 2px;
+      transition: width 0.5s ease;
+      box-shadow: 0 0 8px var(--accent-cyan);
+    }
+
+    /* ─── MAIN AREA ────────────────────────────────────────────── */
+    .main-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 64px;
+    }
+
+    /* ─── MOUSE GLOW EFFECT ────────────────────────────────────── */
+    .mouse-glow {
+      position: fixed;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(0, 212, 255, 0.2) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 2;
+      filter: blur(60px);
+      display: none;
+    }
+    .slide.active .mouse-glow {
+      display: block;
+    }
+
+    /* ─── BOTTOM BAR ───────────────────────────────────────────── */
+    .bottom-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px 24px;
+      flex-shrink: 0;
+    }
+    .bottom-bar .course-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .bottom-bar .nav-dots {
+      display: flex;
+      gap: 8px;
+    }
+    .bottom-bar .audio-info {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .bottom-bar .audio-info .status {
+      color: var(--accent-cyan);
+    }
+    .nav-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .nav-dot.active {
+      background: var(--accent-cyan);
+      transform: scale(1.3);
+      box-shadow: 0 0 6px var(--accent-cyan);
+    }
+
+    /* ─── AUDIO CONTROL ────────────────────────────────────────── */
+    .audio-toggle {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: rgba(0, 212, 255, 0.1);
+      border: 2px solid rgba(0, 212, 255, 0.4);
+      color: var(--accent-cyan);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2em;
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+    .audio-toggle:hover {
+      background: rgba(0, 212, 255, 0.2);
+      border-color: rgba(0, 212, 255, 0.8);
+      box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+    }
+    .audio-toggle.playing {
+      background: rgba(0, 212, 255, 0.2);
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SLIDE 1 — KAPAK
+    ═══════════════════════════════════════════════════════════ */
+    #slide-1 .main-area { align-items: flex-start; padding-left: 80px; }
+
+    .slide-1-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--accent-cyan);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      opacity: 0;
+      animation: fadeSlideUp 0.7s 0.3s forwards;
+    }
+    .slide-1-eyebrow::before {
+      content: '';
+      width: 32px; height: 1px;
+      background: var(--accent-cyan);
+      box-shadow: 0 0 6px var(--accent-cyan);
+    }
+
+    .slide-1-title {
+      font-size: 72px;
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeSlideUp 0.7s 0.5s forwards;
+    }
+    .slide-1-title .line-1 {
+      display: block;
+      color: var(--text-primary);
+    }
+    .slide-1-title .line-2 {
+      display: block;
+      background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-blue) 50%, var(--accent-purple) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .slide-1-subtitle {
+      font-size: 18px;
+      font-weight: 300;
+      color: var(--text-secondary);
+      max-width: 520px;
+      line-height: 1.6;
+      margin-bottom: 40px;
+      opacity: 0;
+      animation: fadeSlideUp 0.7s 0.7s forwards;
+    }
+
+    .slide-1-meta {
+      display: flex;
+      gap: 32px;
+      opacity: 0;
+      animation: fadeSlideUp 0.7s 0.9s forwards;
+    }
+    .meta-chip {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .meta-chip .label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .meta-chip .value {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    /* Decorative right panel for slide 1 */
+    .slide-1-deco {
+      position: absolute;
+      right: 0; top: 0; bottom: 0;
+      width: 420px;
+      z-index: 5;
+      pointer-events: none;
+      opacity: 0;
+      animation: fadeIn 1.2s 0.4s forwards;
+    }
+    .deco-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid;
+      animation: rotateSlow linear infinite;
+    }
+    .deco-ring-1 {
+      width: 320px; height: 320px;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      border-color: rgba(0,212,255,0.15);
+      animation-duration: 28s;
+    }
+    .deco-ring-2 {
+      width: 220px; height: 220px;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      border-color: rgba(79,158,255,0.2);
+      animation-duration: 18s;
+      animation-direction: reverse;
+    }
+    .deco-ring-3 {
+      width: 120px; height: 120px;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      border-color: rgba(168,85,247,0.25);
+      animation-duration: 12s;
+    }
+    .deco-ring .ring-dot {
+      position: absolute;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      top: -4px; left: 50%;
+      margin-left: -4px;
+    }
+    .deco-ring-1 .ring-dot { background: var(--accent-cyan); box-shadow: 0 0 10px var(--accent-cyan); }
+    .deco-ring-2 .ring-dot { background: var(--accent-blue); box-shadow: 0 0 10px var(--accent-blue); }
+    .deco-ring-3 .ring-dot { background: var(--accent-purple); box-shadow: 0 0 10px var(--accent-purple); }
+
+    /* ═══════════════════════════════════════════════════════════
+       SLIDE 2 — İÇERİK (BAŞLIK + METİN)
+    ═══════════════════════════════════════════════════════════ */
+    .content-slide .main-area {
+      padding: 0 80px;
+      gap: 0;
+    }
+
+    .section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--accent-cyan);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-label::before {
+      content: '';
+      width: 24px; height: 1px;
+      background: var(--accent-cyan);
+    }
+
+    .slide-heading {
+      font-size: 48px;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 32px;
+    }
+    .slide-heading .accent { color: var(--accent-cyan); }
+
+    .slide-body {
+      font-size: 18px;
+      font-weight: 300;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      max-width: 700px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SLIDE 3 — İKİ SÜTUN
+    ═══════════════════════════════════════════════════════════ */
+    .two-col .main-area {
+      flex-direction: row;
+      align-items: stretch;
+      padding: 0 64px;
+      gap: 48px;
+    }
+    .col-left, .col-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .col-divider {
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, rgba(0,212,255,0.3), transparent);
+      flex-shrink: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SLIDE 4 — KART GRID
+    ═══════════════════════════════════════════════════════════ */
+    .card-grid-slide .main-area {
+      padding: 0 64px;
+      gap: 24px;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .info-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(0,212,255,0.12);
+      border-radius: 12px;
+      padding: 24px;
+      backdrop-filter: blur(8px);
+      transition: border-color 0.3s, background 0.3s, transform 0.3s;
+      cursor: default;
+    }
+    .info-card:hover {
+      border-color: rgba(0,212,255,0.35);
+      background: rgba(0,212,255,0.06);
+      transform: translateY(-3px);
+    }
+    .card-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(79,158,255,0.1));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+      font-size: 20px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .card-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SLIDE 5 — BÜYÜK STAT / VERİ ODAKLI
+    ═══════════════════════════════════════════════════════════ */
+    .stat-slide .main-area {
+      flex-direction: row;
+      align-items: center;
+      padding: 0 80px;
+      gap: 64px;
+    }
+    .stat-left {
+      flex: 1;
+    }
+    .stat-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .big-stat {
+      font-size: 96px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+    .big-stat-label {
+      font-size: 16px;
+      color: var(--text-secondary);
+      font-weight: 300;
+    }
+
+    .stat-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .stat-row-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .stat-row-header .val {
+      color: var(--accent-cyan);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .stat-bar-bg {
+      height: 6px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .stat-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
+      box-shadow: 0 0 8px var(--accent-cyan);
+      animation: barGrow 1.2s cubic-bezier(0.4,0,0.2,1) forwards;
+      width: 0;
+    }
+    @keyframes barGrow {
+      to { width: var(--target-w, 70%); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SLIDE 6 — ZAMAN ÇİZELGESİ
+    ═══════════════════════════════════════════════════════════ */
+    .timeline-slide .main-area {
+      padding: 0 80px;
+      gap: 8px;
+    }
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      position: relative;
+      padding-left: 32px;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 8px; top: 12px; bottom: 12px;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--accent-cyan), var(--accent-blue), var(--accent-purple));
+      border-radius: 1px;
+    }
+    .timeline-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 14px 0;
+      position: relative;
+    }
+    .timeline-dot {
+      position: absolute;
+      left: -28px;
+      top: 18px;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      box-shadow: 0 0 10px var(--accent-cyan);
+      border: 2px solid var(--navy-900);
+      flex-shrink: 0;
+    }
+    .timeline-item:nth-child(2) .timeline-dot { background: var(--accent-blue); box-shadow: 0 0 10px var(--accent-blue); }
+    .timeline-item:nth-child(3) .timeline-dot { background: var(--accent-teal); box-shadow: 0 0 10px var(--accent-teal); }
+    .timeline-item:nth-child(4) .timeline-dot { background: var(--accent-purple); box-shadow: 0 0 10px var(--accent-purple); }
+    .timeline-year {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--accent-cyan);
+      min-width: 60px;
+      padding-top: 2px;
+    }
+    .timeline-text strong {
+      display: block;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .timeline-text p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SLIDE 10 — KAPANIŞ
+    ═══════════════════════════════════════════════════════════ */
+    #slide-10 .main-area {
+      align-items: center;
+      text-align: center;
+    }
+    .closing-icon {
+      width: 80px; height: 80px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(79,158,255,0.1));
+      border: 1px solid rgba(0,212,255,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      margin: 0 auto 28px;
+      animation: floatY 3s ease-in-out infinite;
+    }
+    @keyframes floatY {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-10px); }
+    }
+    .closing-title {
+      font-size: 56px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue), var(--accent-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+    }
+    .closing-sub {
+      font-size: 18px;
+      color: var(--text-secondary);
+      font-weight: 300;
+      max-width: 480px;
+      line-height: 1.6;
+    }
+
+    /* ─── SHARED ANIMATIONS ────────────────────────────────────── */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes rotateSlow {
+      from { transform: translate(-50%,-50%) rotate(0deg); }
+      to   { transform: translate(-50%,-50%) rotate(360deg); }
+    }
+
+    /* ─── NAVIGATION ARROWS ────────────────────────────────────── */
+    .nav-arrow {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 100;
+      background: rgba(0,212,255,0.08);
+      border: 1px solid rgba(0,212,255,0.2);
+      color: var(--accent-cyan);
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      transition: background 0.3s, border-color 0.3s;
+      user-select: none;
+    }
+    .nav-arrow:hover {
+      background: rgba(0,212,255,0.18);
+      border-color: rgba(0,212,255,0.5);
+    }
+    #prev-btn { left: 16px; }
+    #next-btn { right: 16px; }
+
+    /* ─── HEX GRID OVERLAY ────────────────────────────────────── */
+    .hex-grid {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+      opacity: 0.035;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100'%3E%3Cpolygon points='28,2 54,16 54,44 28,58 2,44 2,16' fill='none' stroke='%2300d4ff' stroke-width='0.8'/%3E%3Cpolygon points='28,52 54,66 54,94 28,108 2,94 2,66' fill='none' stroke='%2300d4ff' stroke-width='0.8'/%3E%3C/svg%3E");
+      background-size: 56px 100px;
+    }
+
+    /* ─── SCANLINE OVERLAY ─────────────────────────────────────── */
+    .scanlines {
+      position: absolute;
+      inset: 0;
+      z-index: 8;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 3px,
+        rgba(0,0,0,0.04) 3px,
+        rgba(0,0,0,0.04) 4px
+      );
+    }
+
+    /* ─── GLITCH LINE ─────────────────────────────────────────── */
+    .glitch-line {
+      position: absolute;
+      left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,212,255,0.4), transparent);
+      z-index: 9;
+      pointer-events: none;
+      animation: glitchScan 8s ease-in-out infinite;
+    }
+    @keyframes glitchScan {
+      0%   { top: 10%; opacity: 0; }
+      5%   { opacity: 0.8; }
+      45%  { top: 90%; opacity: 0.4; }
+      50%  { opacity: 0; }
+      100% { top: 10%; opacity: 0; }
+    }
+
+    /* ─── CORNER ACCENTS ───────────────────────────────────────── */
+    .corner-tl, .corner-br {
+      position: absolute;
+      z-index: 9;
+      pointer-events: none;
+    }
+    .corner-tl {
+      top: 18px; left: 18px;
+      width: 24px; height: 24px;
+      border-top: 2px solid rgba(0,212,255,0.4);
+      border-left: 2px solid rgba(0,212,255,0.4);
+    }
+    .corner-br {
+      bottom: 18px; right: 18px;
+      width: 24px; height: 24px;
+      border-bottom: 2px solid rgba(0,212,255,0.4);
+      border-right: 2px solid rgba(0,212,255,0.4);
+    }
+
+    /* ─── DATA PACKET TRAIL ───────────────────────────────────── */
+    .packet-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    /* ─── GLOW BLOBS ───────────────────────────────────────────── */
+    .glow-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 2;
+      animation: blobDrift ease-in-out infinite alternate;
+    }
+    .glow-blob-1 {
+      width: 400px; height: 400px;
+      background: rgba(0,212,255,0.06);
+      top: -100px; right: -80px;
+      animation-duration: 14s;
+    }
+    .glow-blob-2 {
+      width: 300px; height: 300px;
+      background: rgba(168,85,247,0.05);
+      bottom: -80px; left: -60px;
+      animation-duration: 18s;
+    }
+    @keyframes blobDrift {
+      from { transform: translate(0,0) scale(1); }
+      to   { transform: translate(30px,20px) scale(1.08); }
+    }
+
+    /* ─── KEYBOARD HINT ────────────────────────────────────────── */
+    .key-hint {
+      position: fixed;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: rgba(255,255,255,0.2);
+      letter-spacing: 0.1em;
+      z-index: 200;
+    }
+
+    /* ─── CUSTOM STYLES FOR NEW SLIDES ─────────────────────────── */
+    .list-content {
+      font-size: 18px;
+      font-weight: 300;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      max-width: 700px;
+      margin-top: 20px;
+    }
+    .list-content ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    .list-content li {
+      margin-bottom: 10px;
+      position: relative;
+      padding-left: 25px;
+    }
+    .list-content li::before {
+      content: '»';
+      position: absolute;
+      left: 0;
+      color: var(--accent-cyan);
+      font-weight: 600;
+    }
+    .image-background {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0.15; /* Adjust as needed */
+      z-index: 0;
+    }
+  </style>
+    <audio id="bgAudio" loop volume="0.3" src="background_music.mp3"></audio>
+  </head>
+  <body>
+    <div class="mouse-glow" id="mouseGlow"></div>
+
+<!-- Navigation arrows -->
+<button class="nav-arrow" id="prev-btn" onclick="changeSlide(-1)">&#8592;</button>
+<button class="nav-arrow" id="next-btn" onclick="changeSlide(1)">&#8594;</button>
+<div class="key-hint">← → tuşları veya tıklayarak geçiş yapın</div>
+
+<div id="presentation">
+
+  <!-- ══════════════════════════════════════════════════════════
+       SLIDE 1 — KAPAK
+  ══════════════════════════════════════════════════════════ -->
+  <div class="slide active" id="slide-1">
+    <canvas class="bg-canvas" id="canvas-1"></canvas>
+    <div class="glow-blob glow-blob-1"></div>
+    <div class="glow-blob glow-blob-2"></div>
+    <div class="hex-grid"></div>
+    <div class="scanlines"></div>
+    <div class="glitch-line"></div>
+    <div class="corner-tl"></div>
+    <div class="corner-br"></div>
+
+    <div class="slide-content">
+      <div class="top-bar">
+        <div class="logo-mark">
+          <div class="dot-grid">
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+          </div>
+          Veri İletişimi
+        </div>
+        <div class="slide-counter"><span id="cur-1">01</span> / <span id="tot-1">09</span></div>
+      </div>
+      <div class="progress-line"><div class="progress-fill" id="prog-1"></div></div>
+
+      <div class="main-area">
+        <div class="slide-1-eyebrow">Final Projesi Sunumu</div>
+        <h1 class="slide-1-title">
+          <span class="line-1">Veri İletişiminde</span>
+          <span class="line-2">İş Sürekliliği</span>
+        </h1>
+        <p class="slide-1-subtitle">
+          Bankacılık Sektöründe Kesintisiz Hizmet ve Felaket Kurtarma Stratejileri.
+        </p>
+        <div class="slide-1-meta">
+          <div class="meta-chip">
+            <span class="label">Hazırlayanlar</span>
+            <span class="value">Ediz Kaçmaz</span>
+            <span class="value">Esma Civil</span>
+          </div>
+          <div class="meta-chip">
+            <span class="label">Ders</span>
+            <span class="value">Veri İletişimi</span>
+          </div>
+          <div class="meta-chip">
+            <span class="label">Tarih</span>
+            <span class="value">Mayıs 2026</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Decorative rings -->
+      <div class="slide-1-deco">
+        <div class="deco-ring deco-ring-1"><span class="ring-dot"></span></div>
+        <div class="deco-ring deco-ring-2"><span class="ring-dot"></span></div>
+        <div class="deco-ring deco-ring-3"><span class="ring-dot"></span></div>
+      </div>
+
+      <div class="bottom-bar">
+        <span class="course-tag">Veri İletişimi — Final Projesi</span>
+        <div class="nav-dots" id="nav-dots-1"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SLIDE 2 — DERS DEĞERLENDİRME VE GÖRÜŞLER
+  ══════════════════════════════════════════════════════════ -->
+  <div class="slide content-slide" id="slide-2">
+    <canvas class="bg-canvas" id="canvas-2"></canvas>
+    <div class="glow-blob glow-blob-1"></div>
+    <div class="glow-blob glow-blob-2"></div>
+    <div class="hex-grid"></div>
+    <div class="scanlines"></div>
+    <div class="glitch-line"></div>
+    <div class="corner-tl"></div>
+    <div class="corner-br"></div>
+
+    <div class="slide-content">
+      <div class="top-bar">
+        <div class="logo-mark">
+          <div class="dot-grid">
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+          </div>
+          Veri İletişimi
+        </div>
+        <div class="slide-counter"><span>02</span> / <span>09</span></div>
+      </div>
+      <div class="progress-line"><div class="progress-fill" style="width:20%"></div></div>
+
+      <div class="main-area">
+        <div class="section-label">Ders Değerlendirme</div>
+        <h2 class="slide-heading">Katkılar ve <span class="accent">Öneriler</span></h2>
+        <div class="list-content">
+          <ul>
+            <li>Doğrudan işin içindeki kişilerin deneyimlerini dinleyip ders çıkarabilme fırsatı <span style="color:var(--accent-teal); font-weight:500;">✓ Olumlu</span></li>
+            <li>Çevre genişletme ve geliştirme imkânı <span style="color:var(--accent-teal); font-weight:500;">✓ Olumlu</span></li>
+            <li>Proje ödevlerinin daha fazla kişisel fayda sağlayacak noktalarda şekillendirilmesi gerekliliği</li>
+            <li>Ödevlerin, kuralların ve duyuruların anlam kargaşasına yol açmayacak, net bir mecra üzerinden iletilmesi gerekliliği</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <span class="course-tag">Veri İletişimi — Final Projesi</span>
+        <div class="nav-dots" id="nav-dots-2"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SLIDE 3 — BANKACILIKTA 24/7 KESİNTİSİZLİK
+  ══════════════════════════════════════════════════════════ -->
+  <div class="slide content-slide" id="slide-3">
+    <canvas class="bg-canvas" id="canvas-3"></canvas>
+    <div class="glow-blob glow-blob-1"></div>
+    <div class="glow-blob glow-blob-2"></div>
+    <div class="hex-grid"></div>
+    <div class="scanlines"></div>
+    <div class="glitch-line"></div>
+    <div class="corner-tl"></div>
+    <div class="corner-br"></div>
+
+    <div class="slide-content">
+      <div class="top-bar">
+        <div class="logo-mark">
+          <div class="dot-grid">
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+          </div>
+          Veri İletişimi
+        </div>
+        <div class="slide-counter"><span>03</span> / <span>09</span></div>
+      </div>
+      <div class="progress-line"><div class="progress-fill" style="width:30%"></div></div>
+
+      <div class="main-area">
+        <div class="section-label">Bankacılık Sektörü</div>
+        <h2 class="slide-heading">24/7 Kesintisiz Hizmetin <span class="accent">Önemi</span></h2>
+        <div class="list-content">
+          <ul>
+            <li>Müşteri beklentileri ve milisaniyelerin finansal değeri.</li>
+            <li>Kesintinin itibar ve yasal riskleri.</li>
+            <li>Erişilebilirlik = Güven: Kesintisiz hizmet müşteri güvenini inşa eder.</li>
+            <li>Kurtarma = Hayatta Kalma: Kurtarma yeteneği işletme dayanıklılığını belirler.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <span class="course-tag">Veri İletişimi — Final Projesi</span>
+        <div class="nav-dots" id="nav-dots-3"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SLIDE 4 — YÜKSEK ERİŞİLEBİLİRLİK (HA) VE SPOF
+  ══════════════════════════════════════════════════════════ -->
+  <div class="slide content-slide" id="slide-4">
+    <canvas class="bg-canvas" id="canvas-4"></canvas>
+    <div class="glow-blob glow-blob-1"></div>
+    <div class="glow-blob glow-blob-2"></div>
+    <div class="hex-grid"></div>
+    <div class="scanlines"></div>
+    <div class="glitch-line"></div>
+    <div class="corner-tl"></div>
+    <div class="corner-br"></div>
+
+    <div class="slide-content">
+      <div class="top-bar">
+        <div class="logo-mark">
+          <div class="dot-grid">
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+          </div>
+          Veri İletişimi
+        </div>
+        <div class="slide-counter"><span>04</span> / <span>09</span></div>
+      </div>
+      <div class="progress-line"><div class="progress-fill" style="width:40%"></div></div>
+
+      <div class="main-area">
+        <div class="section-label">Altyapı Stratejileri</div>
+        <h2 class="slide-heading">Yüksek Erişilebilirlik (HA) ve <span class="accent">Tek Nokta Hatası (SPOF)</span></h2>
+        <div class="list-content">
+          <ul>
+            <li><strong>SPOF (Single Point of Failure):</strong> Sistemde tek bir bileşenin arızalanması durumunda tüm sistemin çökmesine neden olan kritik noktalar.</li>
+            <li><strong>Yedeklilik (Redundancy) Mimarileri:</strong>
+              <ul>
+                <li><strong>Active-Active:</strong> Tüm sistemler eşzamanlı çalışır, yük dağıtılır, sıfır kesinti hedeflenir.</li>
+                <li><strong>Active-Passive:</strong> Birincil sistem aktif, ikincil sistem beklemede olup hata anında devreye girer.</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <span class="course-tag">Veri İletişimi — Final Projesi</span>
+        <div class="nav-dots" id="nav-dots-4"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SLIDE 5 — KURTARMA METRİKLERİ: RTO VE RPO
+  ══════════════════════════════════════════════════════════ -->
+  <div class="slide content-slide" id="slide-5">
+    <canvas class="bg-canvas" id="canvas-5"></canvas>
+    <div class="glow-blob glow-blob-1"></div>
+    <div class="glow-blob glow-blob-2"></div>
+    <div class="hex-grid"></div>
+    <div class="scanlines"></div>
+    <div class="glitch-line"></div>
+    <div class="corner-tl"></div>
+    <div class="corner-br"></div>
+
+    <div class="slide-content">
+      <div class="top-bar">
+        <div class="logo-mark">
+          <div class="dot-grid">
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+          </div>
+          Veri İletişimi
+        </div>
+        <div class="slide-counter"><span>05</span> / <span>09</span></div>
+      </div>
+      <div class="progress-line"><div class="progress-fill" style="width:50%"></div></div>
+
+      <div class="main-area">
+        <div class="section-label">İş Sürekliliği</div>
+        <h2 class="slide-heading">Kurtarma Metrikleri: <span class="accent">RTO ve RPO</span></h2>
+        <div class="list-content">
+          <ul>
+            <li><strong>RTO (Recovery Time Objective):</strong> Maksimum kabul edilebilir kesinti süresi. Sistem ne kadar sürede geri yüklenmeli?</li>
+            <li><strong>RPO (Recovery Point Objective):</strong> Maksimum kabul edilebilir veri kaybı. Ne kadar veri kaybedilebilir?</li>
+            <li>Bu metriklerin belirlenmesi, kabul edilebilir kesinti süresi ve veri kaybı dengesinin stratejik önemini vurgular.</li>
+            <li><strong>Bankacılıkta RTO/RPO Hedefleri:</strong>
+              <ul>
+                <li>Temel Bankacılık: RTO (dakikalar), RPO (sıfıra yakın).</li>
+                <li>Ödeme Sistemleri: RTO (saniyeler), RPO (sıfır).</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <span class="course-tag">Veri İletişimi — Final Projesi</span>
+        <div class="nav-dots" id="nav-dots-5"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SLIDE 6 — BULUT MİMARİLERİ VE REGÜLASYON
+  ══════════════════════════════════════════════════════════ -->
+  <div class="slide content-slide" id="slide-6">
+    <canvas class="bg-canvas" id="canvas-6"></canvas>
+    <div class="glow-blob glow-blob-1"></div>
+    <div class="glow-blob glow-blob-2"></div>
+    <div class="hex-grid"></div>
+    <div class="scanlines"></div>
+    <div class="glitch-line"></div>
+    <div class="corner-tl"></div>
+    <div class="corner-br"></div>
+
+    <div class="slide-content">
+      <div class="top-bar">
+        <div class="logo-mark">
+          <div class="dot-grid">
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+          </div>
+          Veri İletişimi
+        </div>
+        <div class="slide-counter"><span>06</span> / <span>09</span></div>
+      </div>
+      <div class="progress-line"><div class="progress-fill" style="width:60%"></div></div>
+
+      <div class="main-area">
+        <div class="section-label">Modern Yaklaşımlar</div>
+        <h2 class="slide-heading">Bulut Mimarileri ve <span class="accent">BDDK Regülasyonu</span></h2>
+        <div class="list-content">
+          <ul>
+            <li><strong>Multi-AZ (Availability Zone):</strong> Uygulamaların birden fazla erişilebilirlik bölgesine dağıtılması, veri merkezi düzeyindeki hatalara karşı koruma sağlar.</li>
+            <li><strong>Multi-Region:</strong> Sistemlerin farklı coğrafi bölgelere dağıtılması, bölgesel felaketlere karşı tam koruma ve felaket kurtarma yeteneği sunar.</li>
+            <li><strong>Otomatik Failover:</strong> Arıza durumunda otomatik trafik yönlendirme (DNS / Load Balancer tabanlı anahtarlama) ile minimum veya sıfır kesinti süresi hedeflenir.</li>
+            <li><strong>BDDK Uyumluluğu:</strong> Veri merkezi stratejileri ve bulut mimarileri, Bankacılık Düzenleme ve Denetleme Kurumu (BDDK) uyumluluğu çerçevesinde şekillendirilmelidir.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <span class="course-tag">Veri İletişimi — Final Projesi</span>
+        <div class="nav-dots" id="nav-dots-6"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SLIDE 8 — VAKA ANALİZİ: KRİZ YÖNETİMİ
+  ══════════════════════════════════════════════════════════ -->
+  <div class="slide content-slide" id="slide-7">
+    <canvas class="bg-canvas" id="canvas-7"></canvas>
+    <div class="glow-blob glow-blob-1"></div>
+    <div class="glow-blob glow-blob-2"></div>
+    <div class="hex-grid"></div>
+    <div class="scanlines"></div>
+    <div class="glitch-line"></div>
+    <div class="corner-tl"></div>
+    <div class="corner-br"></div>
+
+    <div class="slide-content">
+      <div class="top-bar">
+        <div class="logo-mark">
+          <div class="dot-grid">
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+          </div>
+          Veri İletişimi
+        </div>
+        <div class="slide-counter"><span>07</span> / <span>09</span></div>
+      </div>
+      <div class="progress-line"><div class="progress-fill" style="width:77%"></div></div>
+
+      <div class="main-area">
+        <div class="section-label">Gerçek Dünya Senaryosu</div>
+        <h2 class="slide-heading">Vaka Analizi: <span class="accent">Maaş Günü Kesintisi</span></h2>
+        <div class="list-content">
+          <ul>
+            <li><strong>Senaryo:</strong> Maaş ödemeleri günü, bankacılık sistemlerinde yoğun trafik ve milyonlarca eşzamanlı kullanıcı.</li>
+            <li><strong>Olay:</strong> Birincil veri merkezinde yaşanan bir arıza sonucu mobil bankacılık hizmetlerinin kesintiye uğraması.</li>
+            <li><strong>Etkileri:</strong> Müşterilerin giriş yapamaması, işlem gerçekleştirememesi, ATM/POS ve mobil bankacılıkta yoğunluk, sosyal medyada olumsuz tepkiler.</li>
+            <li><strong>Kriz Yönetimi:</strong>
+              <ul>
+                <li><strong>Failover Süreçleri:</strong> İkincil siteye/bölgeye otomatik veya manuel geçiş.</li>
+                <li><strong>Runbook Uygulamaları:</strong> Önceden tanımlanmış kriz yönetim prosedürlerinin (runbook) devreye alınması.</li>
+                <li><strong>RTO/RPO Hedefleri:</strong> Kesinti süresi (RTO) ve veri kaybı (RPO) hedeflerine ulaşılıp ulaşılamadığının değerlendirilmesi.</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <span class="course-tag">Veri İletişimi — Final Projesi</span>
+        <div class="nav-dots" id="nav-dots-7"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SLIDE 9 — SONUÇ VE YBS ÇIKARIMLARI
+  ══════════════════════════════════════════════════════════ -->
+  <div class="slide content-slide" id="slide-8">
+    <canvas class="bg-canvas" id="canvas-8"></canvas>
+    <div class="glow-blob glow-blob-1"></div>
+    <div class="glow-blob glow-blob-2"></div>
+    <div class="hex-grid"></div>
+    <div class="scanlines"></div>
+    <div class="glitch-line"></div>
+    <div class="corner-tl"></div>
+    <div class="corner-br"></div>
+
+    <div class="slide-content">
+      <div class="top-bar">
+        <div class="logo-mark">
+          <div class="dot-grid">
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+          </div>
+          Veri İletişimi
+        </div>
+        <div class="slide-counter"><span>08</span> / <span>09</span></div>
+      </div>
+      <div class="progress-line"><div class="progress-fill" style="width:88%"></div></div>
+
+      <div class="main-area">
+        <div class="section-label">Değerlendirme</div>
+        <h2 class="slide-heading">Sonuç ve <span class="accent">YBS Çıkarımları</span></h2>
+        <div class="list-content">
+          <ul>
+            <li><strong>BT Altyapısının Dönüşümü:</strong> Teknik bir birimden "Stratejik Varlığa" dönüşümün önemi.</li>
+            <li><strong>Dersin Genel Özeti:</strong> Veri iletişimi dersinin iş sürekliliği ve felaket kurtarma stratejileri bağlamındaki temel katkıları.</li>
+            <li><strong>Mimari = Strateji:</strong> Sistem tasarımının risk maruziyetini ve iş yeteneklerini nasıl şekillendirdiği.</li>
+            <li><strong>Regülasyon:</strong> Bir kısıtlama değil, tasarım otoritesi olarak BDDK uyumluluğunun stratejik rolü.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <span class="course-tag">Veri İletişimi — Final Projesi</span>
+        <div class="nav-dots" id="nav-dots-8"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SLIDE 10 — TEŞEKKÜRLER, SORU & CEVAP
+  ══════════════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-9">
+    <canvas class="bg-canvas" id="canvas-9"></canvas>
+    <div class="glow-blob glow-blob-1"></div>
+    <div class="glow-blob glow-blob-2"></div>
+    <div class="hex-grid"></div>
+    <div class="scanlines"></div>
+    <div class="glitch-line"></div>
+    <div class="corner-tl"></div>
+    <div class="corner-br"></div>
+
+    <div class="slide-content">
+      <div class="top-bar">
+        <div class="logo-mark">
+          <div class="dot-grid">
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+          </div>
+          Veri İletişimi
+        </div>
+        <div class="slide-counter"><span>09</span> / <span>09</span></div>
+      </div>
+      <div class="progress-line"><div class="progress-fill" style="width:100%"></div></div>
+
+      <div class="closing-bg-img" style="position:absolute; inset:0; z-index:2; pointer-events:none; overflow:hidden; display:flex; align-items:flex-end; justify-content:center;">
+        <img src="closing_image.png" alt="" style="height:88%; width:auto; object-fit:contain; opacity:0.13; filter:grayscale(15%);">
+      </div>
+      <div class="main-area" style="align-items:center; text-align:center; position:relative; z-index:5;">
+        <div class="closing-title">Teşekkürler</div>
+        <p class="closing-sub" style="margin-top:20px;">
+          <strong>Ediz Kaçmaz</strong><br>
+          <span style="color:var(--accent-cyan); font-family:'JetBrains Mono',monospace; font-size:13px;">
+            ediz@edizkacmaz.com
+          </span>
+        </p>
+        <p class="closing-sub" style="margin-top:15px;">
+          <strong>Esma Civil</strong><br>
+          <span style="color:var(--accent-cyan); font-family:'JetBrains Mono',monospace; font-size:13px;">
+            civilesmanur449@gmail.com
+          </span>
+        </p>
+      </div>
+
+      <div class="bottom-bar">
+        <span class="course-tag">Veri İletişimi — Final Projesi</span>
+        <div class="nav-dots" id="nav-dots-9"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /presentation -->
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   BACKGROUND PARTICLE / DATA STREAM CANVAS
+═══════════════════════════════════════════════════════════════ */
+
+const TOTAL_SLIDES = 9;
+let currentSlide = 1;
+const canvases = {};
+const animFrames = {};
+
+let mouse = { x: -100, y: -100, radius: 150 }; // Mouse interaction area
+
+/* ── Colour palette ── */
+
+/* ── Colour palette ── */
+const CYAN   = 'rgba(0,212,255,';
+const BLUE   = 'rgba(79,158,255,';
+const TEAL   = 'rgba(0,255,204,';
+const PURPLE = 'rgba(168,85,247,';
+
+/* ── Data symbols that float across the background ── */
+const DATA_SYMBOLS = [
+  '01','10','11','00',
+  '⬡','◈','◉','⬢',
+  '{\}','[]','</>','///',
+  '∑','∂','∇','∞',
+  '⟨⟩','⊕','⊗','⊞',
+  'TCP','UDP','IP','MAC',
+  'Rx','Tx','ACK','SYN',
+  '0x','FF','A0','3F',
+];
+
+/* ── Particle class ── */
+class Particle {
+  constructor(w, h) {
+    this.w = w; this.h = h;
+    this.reset(true);
+  }
+  reset(init = false) {
+    this.x = init ? Math.random() * this.w : -120;
+    this.y = Math.random() * this.h;
+    this.symbol = DATA_SYMBOLS[Math.floor(Math.random() * DATA_SYMBOLS.length)];
+    this.speed  = 0.25 + Math.random() * 0.55;
+    this.size   = 10 + Math.random() * 10;
+    this.alpha  = 0.04 + Math.random() * 0.10;
+    this.drift  = (Math.random() - 0.5) * 0.12;
+    const r = Math.random();
+    if      (r < 0.4) this.color = CYAN;
+    else if (r < 0.65) this.color = BLUE;
+    else if (r < 0.82) this.color = TEAL;
+    else               this.color = PURPLE;
+  }
+  update() {
+    // Mouse attraction for particles on the first slide
+    if (currentSlide === 1) {
+      const dx = mouse.x - this.x;
+      const dy = mouse.y - this.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < mouse.radius) {
+        const force = (mouse.radius - dist) / mouse.radius * 0.25; // Güçlü çekme
+        this.x += dx * force;
+        this.y += dy * force;
+      }
+    }
+    this.x += this.speed;
+    this.y += this.drift;
+    if (this.x > this.w + 80) this.reset();
+  }
+  draw(ctx) {
+    ctx.save();
+    ctx.globalAlpha = this.alpha;
+    ctx.fillStyle   = this.color + '1)';
+    ctx.font        = `${this.size}px 'JetBrains Mono', monospace`;
+    ctx.fillText(this.symbol, this.x, this.y);
+    ctx.restore();
+  }
+}
+
+/* ── Binary stream columns ── */
+class BinaryStream {
+  constructor(w, h) {
+    this.w = w; this.h = h;
+    this.x = Math.random() * w;
+    this.y = Math.random() * h;
+    this.speed = 0.4 + Math.random() * 0.6;
+    this.chars = Array.from({length: 8 + Math.floor(Math.random()*8)},
+                            () => Math.random() > 0.5 ? '1' : '0');
+    this.alpha = 0.03 + Math.random() * 0.06;
+    this.spacing = 14 + Math.random() * 4;
+    this.color = Math.random() > 0.5 ? CYAN : BLUE;
+  }
+  update() {
+    this.y += this.speed;
+    if (this.y > this.h + this.chars.length * this.spacing) {
+      this.y = -this.chars.length * this.spacing;
+      this.x = Math.random() * this.w;
+    }
+    // randomly flip a bit
+    if (Math.random() < 0.02) {
+      const i = Math.floor(Math.random() * this.chars.length);
+      this.chars[i] = this.chars[i] === '0' ? '1' : '0';
+    }
+  }
+  draw(ctx) {
+    ctx.save();
+    ctx.font = `11px 'JetBrains Mono', monospace`;
+    this.chars.forEach((c, i) => {
+      const fade = 1 - i / this.chars.length;
+      ctx.globalAlpha = this.alpha * fade;
+      ctx.fillStyle   = this.color + '1)';
+      ctx.fillText(c, this.x, this.y + i * this.spacing);
+    });
+    ctx.restore();
+  }
+}
+
+/* ── Connection nodes ── */
+class Node {
+  constructor(w, h) {
+    this.w = w; this.h = h;
+    this.x = Math.random() * w;
+    this.y = Math.random() * h;
+    this.vx = (Math.random() - 0.5) * 0.3;
+    this.vy = (Math.random() - 0.5) * 0.3;
+    this.r  = 1.5 + Math.random() * 2;
+    this.alpha = 0.15 + Math.random() * 0.25;
+    const r = Math.random();
+    this.color = r < 0.5 ? CYAN : r < 0.8 ? BLUE : PURPLE;
+  }
+  update() {
+    // Mouse attraction for nodes on the first slide
+    if (currentSlide === 1) {
+      const dx = mouse.x - this.x;
+      const dy = mouse.y - this.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < mouse.radius) {
+        const force = (mouse.radius - dist) / mouse.radius * 0.02;
+        this.vx -= dx * force;
+        this.vy -= dy * force;
+      }
+    }
+    this.x += this.vx; this.y += this.vy;
+    if (this.x < 0 || this.x > this.w) this.vx *= -1;
+    if (this.y < 0 || this.y > this.h) this.vy *= -1;
+  }
+  draw(ctx) {
+    ctx.save();
+    ctx.globalAlpha = this.alpha;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fillStyle = this.color + '1)';
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+/* ── Data Packet class — bright moving squares ── */
+class DataPacket {
+  constructor(w, h) {
+    this.w = w; this.h = h;
+    this.reset();
+  }
+  reset() {
+    this.x = -20;
+    this.y = Math.random() * this.h;
+    this.speed = 1.2 + Math.random() * 2.4;
+    this.size  = 3 + Math.random() * 5;
+    this.alpha = 0.3 + Math.random() * 0.5;
+    this.trail = [];
+    this.maxTrail = 8 + Math.floor(Math.random() * 12);
+    const r = Math.random();
+    this.color = r < 0.5 ? [0,212,255] : r < 0.8 ? [79,158,255] : [0,255,204];
+  }
+  update() {
+    this.trail.push({x: this.x, y: this.y});
+    if (this.trail.length > this.maxTrail) this.trail.shift();
+    this.x += this.speed;
+    if (this.x > this.w + 20) this.reset();
+  }
+  draw(ctx) {
+    const [r,g,b] = this.color;
+    // Draw trail
+    this.trail.forEach((pt, i) => {
+      const t = i / this.trail.length;
+      ctx.save();
+      ctx.globalAlpha = this.alpha * t * 0.5;
+      ctx.fillStyle = `rgb(${r},${g},${b})`;
+      ctx.fillRect(pt.x - this.size/2, pt.y - this.size/2, this.size * t, this.size * t);
+      ctx.restore();
+    });
+    // Draw head
+    ctx.save();
+    ctx.globalAlpha = this.alpha;
+    ctx.shadowColor = `rgb(${r},${g},${b})`;
+    ctx.shadowBlur  = 8;
+    ctx.fillStyle   = `rgb(${r},${g},${b})`;
+    ctx.fillRect(this.x - this.size/2, this.y - this.size/2, this.size, this.size);
+    ctx.restore();
+  }
+}
+
+/* ── Draw connections between nearby nodes ── */
+function drawConnections(ctx, nodes) {
+  const maxDist = 120;
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const dx = nodes[i].x - nodes[j].x;
+      const dy = nodes[i].y - nodes[j].y;
+      const d  = Math.sqrt(dx*dx + dy*dy);
+      if (d < maxDist) {
+        const a = (1 - d / maxDist) * 0.06;
+        ctx.save();
+        ctx.globalAlpha = a;
+        ctx.strokeStyle = CYAN + '1)';
+        ctx.lineWidth   = 0.5;
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.lineTo(nodes[j].x, nodes[j].y);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+  }
+}
+
+/* ── Initialise canvas for a slide ── */
+function initCanvas(slideIndex) {
+  const id = `canvas-${slideIndex}`;
+  const canvas = document.getElementById(id);
+  if (!canvas || canvases[slideIndex]) return;
+
+  const W = 1280, H = 720;
+  canvas.width  = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  const particles = Array.from({length: 70},  () => new Particle(W, H));
+  const streams   = Array.from({length: 35},  () => new BinaryStream(W, H));
+  const nodes     = Array.from({length: 45},  () => new Node(W, H));
+  const packets   = Array.from({length: 18},  () => {
+    const p = new DataPacket(W, H);
+    p.x = Math.random() * W; // scatter initial positions
+    return p;
+  });
+
+  canvases[slideIndex] = { canvas, ctx, particles, streams, nodes, packets };
+}
+
+function animateCanvas(slideIndex) {
+  const c = canvases[slideIndex];
+  if (!c) return;
+  const { canvas, ctx, particles, streams, nodes, packets } = c;
+
+  // Dark gradient background
+  const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  grad.addColorStop(0,   '#020c1e');
+  grad.addColorStop(0.5, '#0a1628');
+  grad.addColorStop(1,   '#060f1c');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Subtle radial glow top-right
+  const glow = ctx.createRadialGradient(
+    canvas.width * 0.8, canvas.height * 0.2, 0,
+    canvas.width * 0.8, canvas.height * 0.2, 400
+  );
+  glow.addColorStop(0,   'rgba(0,212,255,0.04)');
+  glow.addColorStop(0.5, 'rgba(79,158,255,0.02)');
+  glow.addColorStop(1,   'transparent');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Bottom-left purple glow
+  const glow2 = ctx.createRadialGradient(
+    canvas.width * 0.15, canvas.height * 0.85, 0,
+    canvas.width * 0.15, canvas.height * 0.85, 300
+  );
+  glow2.addColorStop(0,   'rgba(168,85,247,0.04)');
+  glow2.addColorStop(1,   'transparent');
+  ctx.fillStyle = glow2;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Draw layers
+  streams.forEach(s   => { s.update(); s.draw(ctx); });
+  packets.forEach(pk  => { pk.update(); pk.draw(ctx); });
+  drawConnections(ctx, nodes);
+  nodes.forEach(n     => { n.update(); n.draw(ctx); });
+  particles.forEach(p => { p.update(); p.draw(ctx); });
+
+  animFrames[slideIndex] = requestAnimationFrame(() => animateCanvas(slideIndex));
+}
+
+function stopCanvas(slideIndex) {
+  if (animFrames[slideIndex]) {
+    cancelAnimationFrame(animFrames[slideIndex]);
+    delete animFrames[slideIndex];
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SLIDE NAVIGATION
+═══════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════
+   MOUSE GLOW EFFECT
+═══════════════════════════════════════════════════════════════ */
+
+document.addEventListener('mousemove', (e) => {
+  const glow = document.getElementById('mouseGlow');
+  if (glow) {
+    glow.style.left = (e.clientX - 200) + 'px';
+    glow.style.top = (e.clientY - 200) + 'px';
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   AUDIO CONTROL
+═══════════════════════════════════════════════════════════════ */
+
+function setupAudio(audioFile) {
+  const audio = document.getElementById('bgAudio');
+  if (audio && audioFile) {
+    audio.src = audioFile;
+    audio.volume = 0.25;
+  }
+}
+
+function toggleAudio() {
+  const audio = document.getElementById('bgAudio');
+  if (!audio.src) return;
+  
+  if (audio.paused) {
+    audio.play().catch(err => console.log('Audio play failed:', err));
+  } else {
+    audio.pause();
+  }
+}
+
+// Keyboard shortcut for audio (Spacebar)
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' && e.target === document.body) {
+    e.preventDefault();
+    toggleAudio();
+  }
+});
+
+function buildNavDots() {
+  for (let s = 1; s <= TOTAL_SLIDES; s++) {
+    const container = document.getElementById(`nav-dots-${s}`);
+    if (!container) continue;
+    container.innerHTML = '';
+    for (let i = 1; i <= TOTAL_SLIDES; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'nav-dot' + (i === s ? ' active' : '');
+      dot.addEventListener('click', () => goToSlide(i));
+      container.appendChild(dot);
+    }
+  }
+}
+
+function goToSlide(n) {
+  if (n < 1 || n > TOTAL_SLIDES || n === currentSlide) return;
+
+  const prev = document.getElementById(`slide-${currentSlide}`);
+  const next = document.getElementById(`slide-${n}`);
+
+  prev.classList.remove('active');
+  prev.classList.add('exit');
+  setTimeout(() => prev.classList.remove('exit'), 650);
+
+  next.classList.add('active');
+
+  stopCanvas(currentSlide);
+  currentSlide = n;
+
+  if (!canvases[n]) initCanvas(n);
+  animateCanvas(n);
+
+  buildNavDots();
+  updateProgress();
+}
+
+function changeSlide(dir) {
+  goToSlide(currentSlide + dir);
+}
+
+function updateProgress() {
+  // Update slide 1 counter dynamically
+  const cur = document.getElementById('cur-1');
+  const tot = document.getElementById('tot-1');
+  if (cur) cur.textContent = String(currentSlide).padStart(2,'0');
+  if (tot) tot.textContent = String(TOTAL_SLIDES).padStart(2,'0');
+}
+
+/* ── Keyboard navigation ── */
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown'  || e.key === ' ') changeSlide(1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                      changeSlide(-1);
+});
+
+/* ── Responsive scaling ── */
+function scalePresentation() {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const scale = Math.min(vw / 1280, vh / 720);
+  document.getElementById('presentation').style.setProperty('--scale', scale);
+  document.getElementById('presentation').style.transform =
+    `translate(-50%, -50%) scale(${scale})`;
+}
+window.addEventListener('resize', scalePresentation);
+scalePresentation();
+
+/* ── Mouse tracking ── */
+document.addEventListener('mousemove', (e) => {
+  const presentation = document.getElementById('presentation');
+  const rect = presentation.getBoundingClientRect();
+  const scale = parseFloat(presentation.style.getPropertyValue('--scale') || 1);
+
+  mouse.x = (e.clientX - rect.left) / scale;
+  mouse.y = (e.clientY - rect.top) / scale;
+});
+
+/* ── Boot ── */
+buildNavDots();
+initCanvas(1);
+animateCanvas(1);
+
+/* Background Music Control */
+const audio = new Audio('background_music.mp3');
+audio.loop = true;
+audio.volume = 0.3;
+let audioStarted = false;
+
+function startAudio() {
+  if (!audioStarted) {
+    audio.play().catch(e => console.log('Audio play failed:', e));
+    audioStarted = true;
+  }
+}
+
+/* Try to play on first user interaction */
+document.addEventListener('click', startAudio, { once: true });
+document.addEventListener('keydown', startAudio, { once: true });
+
+/* ── Mouse glow effect ── */
+const mouseGlow = document.getElementById('mouseGlow');
+if (mouseGlow) {
+  document.addEventListener('mousemove', (e) => {
+    mouseGlow.style.left = (e.clientX - 200) + 'px';
+    mouseGlow.style.top = (e.clientY - 200) + 'px';
+  });
+}
+
+</script>
+</body>
+</html>
