@@ -897,7 +897,7 @@
           </div>
           Veri İletişimi
         </div>
-        <div class="slide-counter"><span id="cur-1">01</span> / <span id="tot-1">09</span></div>
+        <div class="slide-counter"><span id="cur-1">01</span> / <span id="tot-1">10</span></div>
       </div>
       <div class="progress-line"><div class="progress-fill" id="prog-1"></div></div>
 
@@ -964,7 +964,7 @@
           </div>
           Veri İletişimi
         </div>
-        <div class="slide-counter"><span>02</span> / <span>09</span></div>
+        <div class="slide-counter"><span>02</span> / <span>10</span></div>
       </div>
       <div class="progress-line"><div class="progress-fill" style="width:20%"></div></div>
 
@@ -1011,7 +1011,7 @@
           </div>
           Veri İletişimi
         </div>
-        <div class="slide-counter"><span>03</span> / <span>09</span></div>
+        <div class="slide-counter"><span>03</span> / <span>10</span></div>
       </div>
       <div class="progress-line"><div class="progress-fill" style="width:30%"></div></div>
 
@@ -1058,7 +1058,7 @@
           </div>
           Veri İletişimi
         </div>
-        <div class="slide-counter"><span>04</span> / <span>09</span></div>
+        <div class="slide-counter"><span>04</span> / <span>10</span></div>
       </div>
       <div class="progress-line"><div class="progress-fill" style="width:40%"></div></div>
 
@@ -1108,7 +1108,7 @@
           </div>
           Veri İletişimi
         </div>
-        <div class="slide-counter"><span>05</span> / <span>09</span></div>
+        <div class="slide-counter"><span>05</span> / <span>10</span></div>
       </div>
       <div class="progress-line"><div class="progress-fill" style="width:50%"></div></div>
 
@@ -1137,8 +1137,9 @@
     </div>
   </div>
 
+
   <!-- ══════════════════════════════════════════════════════════
-       SLIDE 6 — BULUT MİMARİLERİ VE REGÜLASYON
+       SLIDE 6 — FELAKET KURTARMA: SITE TİPLERİ
   ══════════════════════════════════════════════════════════ -->
   <div class="slide content-slide" id="slide-6">
     <canvas class="bg-canvas" id="canvas-6"></canvas>
@@ -1160,21 +1161,45 @@
           </div>
           Veri İletişimi
         </div>
-        <div class="slide-counter"><span>06</span> / <span>09</span></div>
+        <div class="slide-counter"><span>06</span> / <span>10</span></div>
       </div>
       <div class="progress-line"><div class="progress-fill" style="width:60%"></div></div>
 
       <div class="main-area">
-        <div class="section-label">Modern Yaklaşımlar</div>
-        <h2 class="slide-heading">Bulut Mimarileri ve <span class="accent">BDDK Regülasyonu</span></h2>
-        <div class="list-content">
-          <ul>
-            <li><strong>Multi-AZ (Availability Zone):</strong> Uygulamaların birden fazla erişilebilirlik bölgesine dağıtılması, veri merkezi düzeyindeki hatalara karşı koruma sağlar.</li>
-            <li><strong>Multi-Region:</strong> Sistemlerin farklı coğrafi bölgelere dağıtılması, bölgesel felaketlere karşı tam koruma ve felaket kurtarma yeteneği sunar.</li>
-            <li><strong>Otomatik Failover:</strong> Arıza durumunda otomatik trafik yönlendirme (DNS / Load Balancer tabanlı anahtarlama) ile minimum veya sıfır kesinti süresi hedeflenir.</li>
-            <li><strong>BDDK Uyumluluğu:</strong> Veri merkezi stratejileri ve bulut mimarileri, Bankacılık Düzenleme ve Denetleme Kurumu (BDDK) uyumluluğu çerçevesinde şekillendirilmelidir.</li>
-          </ul>
+        <div class="section-label">Felaket Kurtarma</div>
+        <h2 class="slide-heading">DR Site Tipleri: <span class="accent">Cold / Warm / Hot</span></h2>
+        <div class="card-grid" style="margin-top:16px; grid-template-columns: repeat(3,1fr); gap:18px;">
+          <div class="info-card" style="border-color:rgba(79,158,255,0.25);">
+            <div class="card-icon" style="font-size:22px;">🧊</div>
+            <div class="card-title" style="color:var(--accent-blue);">Cold Site</div>
+            <div class="card-desc">
+              Yalnızca altyapı hazır, sistemler aktif değil.<br><br>
+              Felaket sonrası kurulum gerekir.<br><br>
+              <span style="color:var(--accent-cyan); font-size:12px;">↑ RTO/RPO &nbsp;|&nbsp; ↓ Maliyet</span>
+            </div>
+          </div>
+          <div class="info-card" style="border-color:rgba(0,212,255,0.3);">
+            <div class="card-icon" style="font-size:22px;">🌤️</div>
+            <div class="card-title" style="color:var(--accent-cyan);">Warm Site</div>
+            <div class="card-desc">
+              Sistemler kısmen hazır, veriler periyodik replike edilir.<br><br>
+              Orta düzey maliyet ve kurtarma süresi.<br><br>
+              <span style="color:var(--accent-cyan); font-size:12px;">↔ Dengeli çözüm</span>
+            </div>
+          </div>
+          <div class="info-card" style="border-color:rgba(0,255,204,0.3);">
+            <div class="card-icon" style="font-size:22px;">🔥</div>
+            <div class="card-title" style="color:var(--accent-teal);">Hot Site</div>
+            <div class="card-desc">
+              Tam işlevsel yedek ortam, gerçek zamanlı replikasyon.<br><br>
+              Anlık failover kapasitesi.<br><br>
+              <span style="color:var(--accent-teal); font-size:12px;">↓ RTO/RPO &nbsp;|&nbsp; ↑ Maliyet</span>
+            </div>
+          </div>
         </div>
+        <p style="margin-top:18px; font-size:13px; color:var(--text-muted); font-family:'JetBrains Mono',monospace; letter-spacing:0.05em;">
+          ▸ Bankacılık sistemleri kritiklik düzeyine göre genellikle Warm veya Hot Site tercih eder.
+        </p>
       </div>
 
       <div class="bottom-bar">
@@ -1185,7 +1210,7 @@
   </div>
 
   <!-- ══════════════════════════════════════════════════════════
-       SLIDE 8 — VAKA ANALİZİ: KRİZ YÖNETİMİ
+       SLIDE 6 — BULUT MİMARİLERİ VE REGÜLASYON
   ══════════════════════════════════════════════════════════ -->
   <div class="slide content-slide" id="slide-7">
     <canvas class="bg-canvas" id="canvas-7"></canvas>
@@ -1207,25 +1232,19 @@
           </div>
           Veri İletişimi
         </div>
-        <div class="slide-counter"><span>07</span> / <span>09</span></div>
+        <div class="slide-counter"><span>07</span> / <span>10</span></div>
       </div>
-      <div class="progress-line"><div class="progress-fill" style="width:77%"></div></div>
+      <div class="progress-line"><div class="progress-fill" style="width:70%"></div></div>
 
       <div class="main-area">
-        <div class="section-label">Gerçek Dünya Senaryosu</div>
-        <h2 class="slide-heading">Vaka Analizi: <span class="accent">Maaş Günü Kesintisi</span></h2>
+        <div class="section-label">Modern Yaklaşımlar</div>
+        <h2 class="slide-heading">Bulut Mimarileri ve <span class="accent">BDDK Regülasyonu</span></h2>
         <div class="list-content">
           <ul>
-            <li><strong>Senaryo:</strong> Maaş ödemeleri günü, bankacılık sistemlerinde yoğun trafik ve milyonlarca eşzamanlı kullanıcı.</li>
-            <li><strong>Olay:</strong> Birincil veri merkezinde yaşanan bir arıza sonucu mobil bankacılık hizmetlerinin kesintiye uğraması.</li>
-            <li><strong>Etkileri:</strong> Müşterilerin giriş yapamaması, işlem gerçekleştirememesi, ATM/POS ve mobil bankacılıkta yoğunluk, sosyal medyada olumsuz tepkiler.</li>
-            <li><strong>Kriz Yönetimi:</strong>
-              <ul>
-                <li><strong>Failover Süreçleri:</strong> İkincil siteye/bölgeye otomatik veya manuel geçiş.</li>
-                <li><strong>Runbook Uygulamaları:</strong> Önceden tanımlanmış kriz yönetim prosedürlerinin (runbook) devreye alınması.</li>
-                <li><strong>RTO/RPO Hedefleri:</strong> Kesinti süresi (RTO) ve veri kaybı (RPO) hedeflerine ulaşılıp ulaşılamadığının değerlendirilmesi.</li>
-              </ul>
-            </li>
+            <li><strong>Multi-AZ (Availability Zone):</strong> Uygulamaların birden fazla erişilebilirlik bölgesine dağıtılması, veri merkezi düzeyindeki hatalara karşı koruma sağlar.</li>
+            <li><strong>Multi-Region:</strong> Sistemlerin farklı coğrafi bölgelere dağıtılması, bölgesel felaketlere karşı tam koruma ve felaket kurtarma yeteneği sunar.</li>
+            <li><strong>Otomatik Failover:</strong> Arıza durumunda otomatik trafik yönlendirme (DNS / Load Balancer tabanlı anahtarlama) ile minimum veya sıfır kesinti süresi hedeflenir.</li>
+            <li><strong>BDDK Uyumluluğu:</strong> Veri merkezi stratejileri ve bulut mimarileri, Bankacılık Düzenleme ve Denetleme Kurumu (BDDK) uyumluluğu çerçevesinde şekillendirilmelidir.</li>
           </ul>
         </div>
       </div>
@@ -1238,7 +1257,7 @@
   </div>
 
   <!-- ══════════════════════════════════════════════════════════
-       SLIDE 9 — SONUÇ VE YBS ÇIKARIMLARI
+       SLIDE 8 — VAKA ANALİZİ: KRİZ YÖNETİMİ
   ══════════════════════════════════════════════════════════ -->
   <div class="slide content-slide" id="slide-8">
     <canvas class="bg-canvas" id="canvas-8"></canvas>
@@ -1260,20 +1279,37 @@
           </div>
           Veri İletişimi
         </div>
-        <div class="slide-counter"><span>08</span> / <span>09</span></div>
+        <div class="slide-counter"><span>08</span> / <span>10</span></div>
       </div>
-      <div class="progress-line"><div class="progress-fill" style="width:88%"></div></div>
+      <div class="progress-line"><div class="progress-fill" style="width:80%"></div></div>
 
       <div class="main-area">
-        <div class="section-label">Değerlendirme</div>
-        <h2 class="slide-heading">Sonuç ve <span class="accent">YBS Çıkarımları</span></h2>
-        <div class="list-content">
-          <ul>
-            <li><strong>BT Altyapısının Dönüşümü:</strong> Teknik bir birimden "Stratejik Varlığa" dönüşümün önemi.</li>
-            <li><strong>Dersin Genel Özeti:</strong> Veri iletişimi dersinin iş sürekliliği ve felaket kurtarma stratejileri bağlamındaki temel katkıları.</li>
-            <li><strong>Mimari = Strateji:</strong> Sistem tasarımının risk maruziyetini ve iş yeteneklerini nasıl şekillendirdiği.</li>
-            <li><strong>Regülasyon:</strong> Bir kısıtlama değil, tasarım otoritesi olarak BDDK uyumluluğunun stratejik rolü.</li>
-          </ul>
+        <div class="section-label">Gerçek Dünya Senaryosu</div>
+        <h2 class="slide-heading">Vaka Analizi: <span class="accent">Maaş Günü Kesintisi</span></h2>
+        <div style="display:flex; gap:28px; align-items:flex-start; margin-top:4px;">
+          <div class="list-content" style="flex:1.1; margin-top:0;">
+            <ul>
+              <li><strong>Senaryo:</strong> Maaş günü, milyonlarca eşzamanlı kullanıcı ve yoğun işlem trafiği.</li>
+              <li><strong>Olay:</strong> Birincil veri merkezinde arıza → mobil bankacılık kesintiye uğradı.</li>
+              <li><strong>Kriz Yanıtı:</strong> İkincil siteye failover, runbook aktivasyonu, DNS yeniden yönlendirme.</li>
+              <li><strong>Kritik Sorular:</strong> RTO/RPO hedefleri tutturuldu mu? Failover otomatik miydi?</li>
+            </ul>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; gap:10px;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--accent-cyan); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:2px;">İş Etkisi</div>
+            <div style="background:rgba(168,85,247,0.08); border:1px solid rgba(168,85,247,0.25); border-radius:10px; padding:12px 14px;">
+              <div style="font-size:13px; font-weight:600; color:#c084fc; margin-bottom:4px;">💸 Finansal Kayıp</div>
+              <div style="font-size:12px; color:var(--text-secondary);">Kaybolan işlemler, SLA cezaları, takas ve likidite riskleri</div>
+            </div>
+            <div style="background:rgba(79,158,255,0.08); border:1px solid rgba(79,158,255,0.25); border-radius:10px; padding:12px 14px;">
+              <div style="font-size:13px; font-weight:600; color:var(--accent-blue); margin-bottom:4px;">👥 Müşteri Kaybı</div>
+              <div style="font-size:12px; color:var(--text-secondary);">Güven erozyonu, rakip bankaya geçiş, sosyal medya krizi</div>
+            </div>
+            <div style="background:rgba(0,212,255,0.06); border:1px solid rgba(0,212,255,0.2); border-radius:10px; padding:12px 14px;">
+              <div style="font-size:13px; font-weight:600; color:var(--accent-cyan); margin-bottom:4px;">⚖️ Regülasyon Riski</div>
+              <div style="font-size:12px; color:var(--text-secondary);">BDDK uyumsuzluk, zorunlu olay raporlama, denetim ve yaptırım</div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1285,9 +1321,9 @@
   </div>
 
   <!-- ══════════════════════════════════════════════════════════
-       SLIDE 10 — TEŞEKKÜRLER, SORU & CEVAP
+       SLIDE 9 — SONUÇ VE YBS ÇIKARIMLARI
   ══════════════════════════════════════════════════════════ -->
-  <div class="slide" id="slide-9">
+  <div class="slide content-slide" id="slide-9">
     <canvas class="bg-canvas" id="canvas-9"></canvas>
     <div class="glow-blob glow-blob-1"></div>
     <div class="glow-blob glow-blob-2"></div>
@@ -1307,7 +1343,54 @@
           </div>
           Veri İletişimi
         </div>
-        <div class="slide-counter"><span>09</span> / <span>09</span></div>
+        <div class="slide-counter"><span>09</span> / <span>10</span></div>
+      </div>
+      <div class="progress-line"><div class="progress-fill" style="width:90%"></div></div>
+
+      <div class="main-area">
+        <div class="section-label">Değerlendirme</div>
+        <h2 class="slide-heading">Sonuç ve <span class="accent">YBS Çıkarımları</span></h2>
+        <div class="list-content">
+          <ul>
+            <li><strong>BT Altyapısının Dönüşümü:</strong> Teknik bir birimden "Stratejik Varlığa" dönüşümün önemi.</li>
+            <li><strong>Dersin Genel Özeti:</strong> Veri iletişimi dersinin iş sürekliliği ve felaket kurtarma stratejileri bağlamındaki temel katkıları.</li>
+            <li><strong>Mimari = Strateji:</strong> Sistem tasarımının risk maruziyetini ve iş yeteneklerini nasıl şekillendirdiği.</li>
+            <li><strong>Regülasyon:</strong> Bir kısıtlama değil, tasarım otoritesi olarak BDDK uyumluluğunun stratejik rolü.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <span class="course-tag">Veri İletişimi — Final Projesi</span>
+        <div class="nav-dots" id="nav-dots-9"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SLIDE 10 — TEŞEKKÜRLER, SORU & CEVAP
+  ══════════════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-10">
+    <canvas class="bg-canvas" id="canvas-10"></canvas>
+    <div class="glow-blob glow-blob-1"></div>
+    <div class="glow-blob glow-blob-2"></div>
+    <div class="hex-grid"></div>
+    <div class="scanlines"></div>
+    <div class="glitch-line"></div>
+    <div class="corner-tl"></div>
+    <div class="corner-br"></div>
+
+    <div class="slide-content">
+      <div class="top-bar">
+        <div class="logo-mark">
+          <div class="dot-grid">
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+          </div>
+          Veri İletişimi
+        </div>
+        <div class="slide-counter"><span>10</span> / <span>10</span></div>
       </div>
       <div class="progress-line"><div class="progress-fill" style="width:100%"></div></div>
 
@@ -1332,7 +1415,7 @@
 
       <div class="bottom-bar">
         <span class="course-tag">Veri İletişimi — Final Projesi</span>
-        <div class="nav-dots" id="nav-dots-9"></div>
+        <div class="nav-dots" id="nav-dots-10"></div>
       </div>
     </div>
   </div>
@@ -1344,7 +1427,7 @@
    BACKGROUND PARTICLE / DATA STREAM CANVAS
 ═══════════════════════════════════════════════════════════════ */
 
-const TOTAL_SLIDES = 9;
+const TOTAL_SLIDES = 10;
 let currentSlide = 1;
 const canvases = {};
 const animFrames = {};
